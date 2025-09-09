@@ -2,50 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Vibecast Music - Warm Cozy Theme Design System */
+/* Vibecast Music - Vibrant Dark Theme Design System */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    /* Core Backgrounds - Warm cozy theme */
-    --background: 20 25% 8%;
-    --background-elevated: 20 30% 10%;
-    --background-surface: 25 25% 12%;
-    --foreground: 35 15% 92%;
+    /* Core Backgrounds - Deep space theme */
+    --background: 230 35% 7%;
+    --background-elevated: 230 35% 9%;
+    --background-surface: 230 30% 11%;
+    --foreground: 220 20% 95%;
 
     /* Cards & Surfaces */
-    --card: 25 25% 12%;
-    --card-foreground: 35 15% 92%;
-    --card-hover: 25 30% 15%;
+    --card: 230 30% 11%;
+    --card-foreground: 220 20% 95%;
+    --card-hover: 230 25% 13%;
 
     /* Interactive Elements */
-    --primary: 25 95% 55%;  /* Warm orange */
+    --primary: 285 100% 65%;  /* Electric purple */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 25 95% 65%;
+    --primary-glow: 285 100% 75%;
     
-    --secondary: 35 45% 75%;  /* Warm beige */
-    --secondary-foreground: 20 25% 8%;
-    --secondary-glow: 35 45% 85%;
+    --secondary: 195 100% 60%;  /* Electric cyan */
+    --secondary-foreground: 0 0% 100%;
+    --secondary-glow: 195 100% 70%;
 
     /* Accent Colors */
-    --accent: 15 85% 50%;  /* Deep orange */
-    --accent-foreground: 0 0% 100%;
-    --accent-glow: 15 85% 60%;
+    --accent: 40 100% 60%;  /* Electric gold */
+    --accent-foreground: 0 0% 0%;
+    --accent-glow: 40 100% 70%;
 
     /* Muted Elements */
-    --muted: 20 20% 18%;
-    --muted-foreground: 35 20% 65%;
+    --muted: 230 20% 15%;
+    --muted-foreground: 220 15% 65%;
 
     /* Destructive */
     --destructive: 0 85% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders & Inputs */
-    --border: 25 25% 20%;
-    --border-hover: 25 30% 25%;
-    --input: 25 25% 12%;
-    --input-focus: 25 30% 18%;
-    --ring: 25 95% 55%;
+    --border: 230 25% 18%;
+    --border-hover: 230 30% 25%;
+    --input: 230 30% 11%;
+    --input-focus: 230 25% 18%;
+    --ring: 285 100% 65%;
 
     /* Layout */
     --radius: 0.75rem;
@@ -53,20 +53,20 @@
     --player-height: 90px;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(25 95% 55%), hsl(35 45% 75%));
-    --gradient-surface: linear-gradient(180deg, hsl(20 30% 10%), hsl(25 25% 12%));
-    --gradient-hero: linear-gradient(45deg, hsl(25 95% 55% / 0.1), hsl(35 45% 75% / 0.1));
+    --gradient-primary: linear-gradient(135deg, hsl(285 100% 65%), hsl(195 100% 60%));
+    --gradient-surface: linear-gradient(180deg, hsl(230 35% 9%), hsl(230 30% 11%));
+    --gradient-hero: linear-gradient(45deg, hsl(285 100% 65% / 0.1), hsl(195 100% 60% / 0.1));
 
     /* Shadows & Glows */
-    --shadow-sm: 0 1px 2px hsl(20 25% 5% / 0.3);
-    --shadow-md: 0 4px 12px hsl(20 25% 5% / 0.4);
-    --shadow-lg: 0 12px 24px hsl(20 25% 5% / 0.5);
-    --glow-primary: 0 0 20px hsl(25 95% 55% / 0.3);
-    --glow-secondary: 0 0 20px hsl(35 45% 75% / 0.3);
+    --shadow-sm: 0 1px 2px hsl(230 35% 5% / 0.3);
+    --shadow-md: 0 4px 12px hsl(230 35% 5% / 0.4);
+    --shadow-lg: 0 12px 24px hsl(230 35% 5% / 0.5);
+    --glow-primary: 0 0 20px hsl(285 100% 65% / 0.3);
+    --glow-secondary: 0 0 20px hsl(195 100% 60% / 0.3);
 
-    /* Player specific - More transparent like Apple Music */
-    --player-background: hsl(20 25% 8% / 0.85);
-    --player-border: hsl(25 25% 20% / 0.6);
+    /* Player specific */
+    --player-background: hsl(230 40% 8% / 0.95);
+    --player-border: hsl(230 25% 18%);
   }
 
   /* Popover */
