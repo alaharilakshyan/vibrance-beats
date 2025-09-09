@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { Search as SearchIcon, Mic, Camera, Clock, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search as SearchIcon, Mic, Camera, Clock, X, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { musicApi, Track } from "@/services/musicApi";
+import { usePlaybackStore } from "@/store/playbackStore";
 
 const genres = [
   { name: "Pop", color: "bg-pink-500", image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=300&h=300&fit=crop" },
@@ -25,11 +27,35 @@ const recentSearches = [
 export default function Search() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showRecentSearches, setShowRecentSearches] = useState(true);
+  const [searchResults, setSearchResults] = useState<Track[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { setCurrentTrack, setQueue } = usePlaybackStore();
 
-  const handleSearch = (query: string) => {
+  const handleSearch = async (query: string) => {
     setSearchQuery(query);
+    if (!query.trim()) {
+      setShowRecentSearches(true);
+      setSearchResults([]);
+      return;
+    }
+    
     setShowRecentSearches(false);
-    // Here you would implement actual search logic
+    setIsLoading(true);
+    
+    try {
+      const results = await musicApi.searchTracks(query);
+      setSearchResults(results);
+    } catch (error) {
+      console.error('Search failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const playTrack = (track: Track) => {
+    setCurrentTrack(track);
+    setQueue([track], 0);
   };
 
   const clearSearch = () => {
@@ -86,15 +112,57 @@ export default function Search() {
       {searchQuery ? (
         <div className="space-y-8">
           {/* Search Results */}
-          <div className="text-center py-12">
-            <SearchIcon className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-muted-foreground">
-              Search for "{searchQuery}"
-            </h3>
-            <p className="text-sm text-muted-foreground mt-2">
-              Find your favorite songs, artists, albums, and playlists.
-            </p>
-          </div>
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Searching...</p>
+            </div>
+          ) : searchResults.length > 0 ? (
+            <section>
+              <h2 className="text-2xl font-bold mb-6">Search Results</h2>
+              <div className="space-y-2">
+                {searchResults.map((track, index) => (
+                  <div
+                    key={track.id}
+                    className="flex items-center gap-4 p-3 rounded-lg hover:bg-card-hover transition-colors group cursor-pointer"
+                    onClick={() => playTrack(track)}
+                  >
+                    <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                      <img 
+                        src={track.coverUrl} 
+                        alt={track.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-foreground truncate">{track.title}</h3>
+                      <p className="text-sm text-muted-foreground truncate">{track.artist}</p>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {Math.floor(track.duration / 60)}:{(track.duration % 60).toString().padStart(2, '0')}
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Play className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ) : (
+            <div className="text-center py-12">
+              <SearchIcon className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-muted-foreground">
+                No results for "{searchQuery}"
+              </h3>
+              <p className="text-sm text-muted-foreground mt-2">
+                Try searching with different keywords.
+              </p>
+            </div>
+          )}
         </div>
       ) : (
         <div className="space-y-8">

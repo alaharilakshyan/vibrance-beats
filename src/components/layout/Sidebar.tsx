@@ -7,9 +7,11 @@ import {
   Plus, 
   Music,
   Disc3,
-  PlayCircle
+  PlayCircle,
+  User
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { UserButton } from "@clerk/clerk-react";
 
 const mainNavItems = [
   { icon: Home, label: "Home", path: "/" },
@@ -45,7 +47,7 @@ export const Sidebar = () => {
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-primary/20 text-primary shadow-glow-primary"
+                  ? "bg-primary/20 text-primary glow-primary"
                   : "text-muted-foreground hover:text-foreground hover:bg-card-hover"
               }`
             }
@@ -100,6 +102,34 @@ export const Sidebar = () => {
               </NavLink>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* User Profile Section */}
+      <div className="mt-auto pt-4 border-t border-border">
+        <div className="flex items-center gap-3 p-3">
+          <UserButton 
+            appearance={{
+              elements: {
+                avatarBox: "w-8 h-8",
+                userButtonPopoverCard: "bg-card border-border",
+                userButtonPopoverActionButton: "text-foreground hover:bg-card-hover",
+              }
+            }}
+          />
+          <NavLink
+            to="/profile"
+            className={({ isActive }) =>
+              `flex items-center gap-3 flex-1 min-w-0 p-2 rounded-lg transition-colors ${
+                isActive
+                  ? "bg-card text-primary"
+                  : "text-muted-foreground hover:text-foreground hover:bg-card-hover"
+              }`
+            }
+          >
+            <User className="w-5 h-5 flex-shrink-0" />
+            <span className="font-medium truncate">Profile</span>
+          </NavLink>
         </div>
       </div>
     </div>
