@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { motion } from "framer-motion";
 import { 
   Play, 
   Pause, 
@@ -9,25 +9,27 @@ import {
   Volume2,
   Heart,
   MoreHorizontal,
-  Maximize2
+  Maximize2,
+  Music
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
+import { useMusicStore } from "@/store/musicStore";
+import { AudioPlayer } from "@/components/player/AudioPlayer";
 
 export const NowPlayingBar = () => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isShuffle, setIsShuffle] = useState(false);
-  const [repeatMode, setRepeatMode] = useState<'off' | 'all' | 'one'>('off');
-  const [volume, setVolume] = useState([70]);
-  const [progress, setProgress] = useState([30]);
-
-  // Mock current track data
-  const currentTrack = {
-    title: "Blinding Lights",
-    artist: "The Weeknd",
-    album: "After Hours",
-    coverUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=80&h=80&fit=crop&crop=center"
-  };
+  const {
+    playback: { currentTrack, isPlaying, volume, progress, repeat, shuffle },
+    setIsPlaying,
+    setVolume,
+    setProgress,
+    toggleShuffle,
+    toggleRepeat,
+    nextTrack,
+    previousTrack,
+    toggleLikeTrack,
+    isTrackLiked,
+  } = useMusicStore();
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -35,120 +37,180 @@ export const NowPlayingBar = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  if (!currentTrack) {
+    return (
+      <div className="glass-player border-t border-player-border h-full flex items-center justify-center">
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <Music className="w-5 h-5" />
+          <span className="text-sm">No track selected</span>
+        </div>
+        <AudioPlayer />
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center justify-between px-4 py-3 h-full">
-      {/* Currently Playing */}
-      <div className="flex items-center gap-3 min-w-0 flex-1">
-        <div className="w-14 h-14 rounded-lg overflow-hidden bg-card flex-shrink-0">
-          <img 
-            src={currentTrack.coverUrl} 
-            alt={currentTrack.title}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="min-w-0">
-          <h4 className="text-sm font-medium text-foreground truncate">
-            {currentTrack.title}
-          </h4>
-          <p className="text-xs text-muted-foreground truncate">
-            {currentTrack.artist}
-          </p>
-        </div>
-        <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground">
-          <Heart className="w-4 h-4" />
-        </Button>
-      </div>
-
-      {/* Player Controls */}
-      <div className="flex flex-col items-center gap-2 flex-1 max-w-md">
-        {/* Control Buttons */}
-        <div className="flex items-center gap-4">
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => setIsShuffle(!isShuffle)}
-            className={`text-muted-foreground hover:text-foreground ${
-              isShuffle ? 'text-primary' : ''
-            }`}
+    <motion.div 
+      initial={{ y: 100 }}
+      animate={{ y: 0 }}
+      className="glass-player border-t border-player-border h-full"
+    >
+      <div className="flex items-center justify-between px-6 py-4 h-full">
+        {/* Currently Playing */}
+        <div className="flex items-center gap-4 min-w-0 flex-1">
+          <motion.div 
+            whileHover={{ scale: 1.05 }}
+            className="w-16 h-16 rounded-xl overflow-hidden bg-card flex-shrink-0 shadow-lg"
           >
-            <Shuffle className="w-4 h-4" />
-          </Button>
-          
-          <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground">
-            <SkipBack className="w-4 h-4" />
-          </Button>
-          
-          <Button
-            size="sm"
-            variant="default"
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="w-8 h-8 rounded-full bg-primary hover:bg-primary-glow shadow-glow-primary"
-          >
-            {isPlaying ? (
-              <Pause className="w-4 h-4" />
-            ) : (
-              <Play className="w-4 h-4 ml-0.5" />
-            )}
-          </Button>
-          
-          <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground">
-            <SkipForward className="w-4 h-4" />
-          </Button>
-          
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => {
-              const modes: ('off' | 'all' | 'one')[] = ['off', 'all', 'one'];
-              const currentIndex = modes.indexOf(repeatMode);
-              setRepeatMode(modes[(currentIndex + 1) % modes.length]);
-            }}
-            className={`text-muted-foreground hover:text-foreground ${
-              repeatMode !== 'off' ? 'text-primary' : ''
-            }`}
-          >
-            <Repeat className="w-4 h-4" />
-            {repeatMode === 'one' && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
-            )}
-          </Button>
+            <img 
+              src={currentTrack.artwork || '/placeholder.svg'} 
+              alt={currentTrack.title}
+              className="w-full h-full object-cover"
+            />
+          </motion.div>
+          <div className="min-w-0 flex-1">
+            <motion.h4 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-sm font-semibold text-foreground truncate mb-1"
+            >
+              {currentTrack.title}
+            </motion.h4>
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+              className="text-xs text-muted-foreground truncate"
+            >
+              {currentTrack.artist}
+            </motion.p>
+          </div>
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <Button 
+              size="sm" 
+              variant="ghost" 
+              onClick={() => toggleLikeTrack(currentTrack)}
+              className={`text-muted-foreground hover:text-foreground transition-colors ${
+                isTrackLiked(currentTrack.id) ? 'text-red-500 hover:text-red-400' : ''
+              }`}
+            >
+              <Heart className={`w-4 h-4 ${isTrackLiked(currentTrack.id) ? 'fill-current' : ''}`} />
+            </Button>
+          </motion.div>
         </div>
 
-        {/* Progress Bar */}
-        <div className="flex items-center gap-2 w-full text-xs text-muted-foreground">
-          <span>{formatTime(90)}</span>
-          <Slider
-            value={progress}
-            onValueChange={setProgress}
-            max={100}
-            step={1}
-            className="flex-1"
-          />
-          <span>{formatTime(300)}</span>
-        </div>
-      </div>
+        {/* Player Controls */}
+        <div className="flex flex-col items-center gap-3 flex-1 max-w-lg">
+          {/* Control Buttons */}
+          <div className="flex items-center gap-6">
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={toggleShuffle}
+                className={`text-muted-foreground hover:text-foreground transition-all duration-200 ${
+                  shuffle ? 'text-primary glow-primary' : ''
+                }`}
+              >
+                <Shuffle className="w-4 h-4" />
+              </Button>
+            </motion.div>
+            
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={previousTrack}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <SkipBack className="w-5 h-5" />
+              </Button>
+            </motion.div>
+            
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                size="sm"
+                variant="default"
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="w-12 h-12 rounded-full bg-gradient-primary hover:scale-105 glow-primary transition-all duration-300"
+              >
+                {isPlaying ? (
+                  <Pause className="w-5 h-5" />
+                ) : (
+                  <Play className="w-5 h-5 ml-0.5" />
+                )}
+              </Button>
+            </motion.div>
+            
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={nextTrack}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <SkipForward className="w-5 h-5" />
+              </Button>
+            </motion.div>
+            
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={toggleRepeat}
+                className={`text-muted-foreground hover:text-foreground transition-all duration-200 ${
+                  repeat !== 'off' ? 'text-primary glow-primary' : ''
+                } relative`}
+              >
+                <Repeat className="w-4 h-4" />
+                {repeat === 'one' && (
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full shadow-lg"></span>
+                )}
+              </Button>
+            </motion.div>
+          </div>
 
-      {/* Volume & Options */}
-      <div className="flex items-center gap-2 flex-1 justify-end">
-        <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground">
-          <MoreHorizontal className="w-4 h-4" />
-        </Button>
-        
-        <div className="flex items-center gap-2">
-          <Volume2 className="w-4 h-4 text-muted-foreground" />
-          <Slider
-            value={volume}
-            onValueChange={setVolume}
-            max={100}
-            step={1}
-            className="w-20"
-          />
+          {/* Progress Bar */}
+          <div className="flex items-center gap-3 w-full text-xs text-muted-foreground">
+            <span className="w-10 text-right">{formatTime(Math.floor(progress * currentTrack.duration / 100))}</span>
+            <Slider
+              value={[progress]}
+              onValueChange={(value) => setProgress(value[0])}
+              max={100}
+              step={0.1}
+              className="flex-1"
+            />
+            <span className="w-10">{formatTime(currentTrack.duration)}</span>
+          </div>
         </div>
-        
-        <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground">
-          <Maximize2 className="w-4 h-4" />
-        </Button>
+
+        {/* Volume & Options */}
+        <div className="flex items-center gap-3 flex-1 justify-end">
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground">
+              <MoreHorizontal className="w-4 h-4" />
+            </Button>
+          </motion.div>
+          
+          <div className="flex items-center gap-3">
+            <Volume2 className="w-4 h-4 text-muted-foreground" />
+            <Slider
+              value={[volume]}
+              onValueChange={(value) => setVolume(value[0])}
+              max={100}
+              step={1}
+              className="w-24"
+            />
+          </div>
+          
+          <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}>
+            <Button size="sm" variant="ghost" className="text-muted-foreground hover:text-foreground">
+              <Maximize2 className="w-4 h-4" />
+            </Button>
+          </motion.div>
+        </div>
       </div>
-    </div>
+      <AudioPlayer />
+    </motion.div>
   );
 };

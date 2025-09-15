@@ -7,6 +7,7 @@ import { AppLayout } from "./components/layout/AppLayout";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
 import Library from "./pages/Library";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="library/liked" element={<Library />} />
             <Route path="library/recent" element={<Library />} />
             <Route path="library/albums" element={<Library />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
